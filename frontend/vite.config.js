@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://expanse-tracker-cuzf.onrender.com',
+        target: 'https://expanse-tracker-1-wj18.onrender.com',
         changeOrigin: true,
       }
     }
