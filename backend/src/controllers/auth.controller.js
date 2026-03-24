@@ -45,7 +45,6 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({ name, email, password });
-  console.log(user);
   await issueOtp(user, "verify");
 
   res.status(201).json(
@@ -178,7 +177,7 @@ export const loginVerify = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { accessToken, user: { _id: user._id, name: user.name, email: user.email } },
+        { accessToken, refreshToken, user: { _id: user._id, name: user.name, email: user.email } },
         "Logged in successfully."
       )
     );
@@ -189,7 +188,8 @@ export const loginVerify = asyncHandler(async (req, res) => {
  * Issue new access token from refresh token stored in httpOnly cookie.
  */
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const token = req.cookies?.refreshToken;
+  // Accept from httpOnly cookie (web) OR request body (mobile/React Native)
+  const token = req.cookies?.refreshToken || req.body?.refreshToken;
   if (!token) throw new ApiError(401, "No refresh token provided.");
 
   let decoded;
@@ -211,7 +211,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   res
     .cookie("refreshToken", newRefresh, cookieOptions(7))
     .status(200)
-    .json(new ApiResponse(200, { accessToken }, "Token refreshed."));
+    .json(new ApiResponse(200, { accessToken, refreshToken: newRefresh }, "Token refreshed."));
 });
 
 /**
