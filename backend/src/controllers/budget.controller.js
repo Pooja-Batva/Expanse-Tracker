@@ -8,7 +8,7 @@ import { ApiError, ApiResponse, asyncHandler } from "../utils/apiHelpers.js";
  * Create a budget for a category over a user-defined date range.
  */
 export const createBudget = asyncHandler(async (req, res) => {
-  const { category, amount, startDate, endDate, label, alertThreshold } = req.body;
+  const { category, amount, startDate, endDate, label } = req.body;
 
   // Validate category ownership
   const cat = await Category.findOne({ _id: category, user: req.user._id });
@@ -54,7 +54,6 @@ export const createBudget = asyncHandler(async (req, res) => {
     endDate: new Date(endDate),
     label,
     spent,
-    alertThreshold: alertThreshold || 80,
   });
 
   await budget.populate("category", "name icon color");
@@ -97,20 +96,17 @@ export const getBudget = asyncHandler(async (req, res) => {
 
 /**
  * PUT /api/budgets/:id
- * Update amount, label, alertThreshold. Dates and category cannot be changed
+ * Update amount, label. Dates and category cannot be changed
  * (delete and recreate instead for accuracy).
  */
 export const updateBudget = asyncHandler(async (req, res) => {
   const budget = await Budget.findOne({ _id: req.params.id, user: req.user._id });
   if (!budget) throw new ApiError(404, "Budget not found.");
 
-  const { amount, label, alertThreshold } = req.body;
+  const { amount, label } = req.body;
 
   if (amount !== undefined) budget.amount = Number(amount);
   if (label !== undefined) budget.label = label;
-  if (alertThreshold !== undefined) budget.alertThreshold = Number(alertThreshold);
-  // Reset alert flag on update
-  budget.alertSent = false;
 
   await budget.save();
   await budget.populate("category", "name icon color type");

@@ -23,17 +23,6 @@ export const validateRegister = (req, _res, next) => {
   next();
 };
 
-export const validateOtp = (req, _res, next) => {
-  const { email, otp } = req.body;
-  const errors = [];
-
-  if (!email || !validator.isEmail(email)) errors.push("Valid email is required.");
-  if (!otp || !/^\d{6}$/.test(otp)) errors.push("OTP must be a 6-digit number.");
-
-  if (errors.length) throw new ApiError(400, "Validation failed", errors);
-  next();
-};
-
 export const validateTransaction = (req, _res, next) => {
   const { amount, type, category, date } = req.body;
   const errors = [];

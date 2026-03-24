@@ -3,10 +3,6 @@ import mongoose from "mongoose";
 import { app } from "./src/app.js";
 import { connectDB } from "./src/db/index.js";
 import logger from "./src/utils/logger.js";
-import {
-  scheduleMonthlyReports,
-  scheduleBudgetAlerts,
-} from "./src/utils/cron.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -55,11 +51,6 @@ const start = async () => {
       `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`,
     );
   });
-
-  // Start cron jobs after server is up
-  scheduleMonthlyReports();
-  scheduleBudgetAlerts();
-  logger.info("⏰ Cron jobs scheduled.");
 };
 
 start();

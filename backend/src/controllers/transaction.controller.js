@@ -28,10 +28,6 @@ const syncBudgetSpent = async (userId, categoryId) => {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
     budget.spent = result[0]?.total || 0;
-    // Reset alert flag if spending drops below threshold
-    if (budget.spent < (budget.alertThreshold / 100) * budget.amount) {
-      budget.alertSent = false;
-    }
     await budget.save();
   }
 };
@@ -68,7 +64,7 @@ export const createTransaction = asyncHandler(async (req, res) => {
   });
 
   // Sync budget spent asynchronously (don't block response)
-  syncBudgetSpent(req.user._id, category).catch(() => {});
+  syncBudgetSpent(req.user._id, category).catch(() => { });
 
   await transaction.populate("category", "name icon color type");
   res.status(201).json(new ApiResponse(201, transaction, "Transaction created."));
@@ -290,7 +286,7 @@ export const updateTransaction = asyncHandler(async (req, res) => {
   // Sync budgets for both old and (possibly new) category
   const categoriesToSync = new Set([oldCategoryId, transaction.category._id.toString()]);
   for (const catId of categoriesToSync) {
-    syncBudgetSpent(req.user._id, catId).catch(() => {});
+    syncBudgetSpent(req.user._id, catId).catch(() => { });
   }
 
   res.status(200).json(new ApiResponse(200, transaction, "Transaction updated."));
@@ -309,7 +305,7 @@ export const deleteTransaction = asyncHandler(async (req, res) => {
   const categoryId = transaction.category.toString();
   await transaction.deleteOne();
 
-  syncBudgetSpent(req.user._id, categoryId).catch(() => {});
+  syncBudgetSpent(req.user._id, categoryId).catch(() => { });
 
   res.status(200).json(new ApiResponse(200, null, "Transaction deleted."));
 });

@@ -12,13 +12,6 @@ const createLimiter = (windowMinutes, max, message) =>
       `${req.ip}::${req.headers["user-agent"] || "unknown"}`,
   });
 
-// Tight limiter for OTP send endpoints (prevents OTP spam)
-export const otpLimiter = createLimiter(
-  15,
-  5,
-  "Too many OTP requests. Please try again after 15 minutes."
-);
-
 // Auth endpoints (login, register)
 export const authLimiter = createLimiter(
   15,

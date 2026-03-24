@@ -65,13 +65,9 @@ api.interceptors.response.use(
 // ── Auth ─────────────────────────────────────────────────────────────────────
 export const authAPI = {
   register:       (d) => api.post('/auth/register', d),
-  verifyEmail:    (d) => api.post('/auth/verify-email', d),
-  resendOtp:      (d) => api.post('/auth/resend-otp', d),
-  loginRequest:   (d) => api.post('/auth/login', d),
-  loginVerify:    (d) => api.post('/auth/login/verify-otp', d),
+  login:          (d) => api.post('/auth/login', d),
   logout:         ()  => api.post('/auth/logout'),
-  forgotPassword: (d) => api.post('/auth/forgot-password', d),
-  resetPassword:  (d) => api.post('/auth/reset-password', d),
+  refresh:        ()  => api.post('/auth/refresh'),
   getMe:          ()  => api.get('/auth/me'),
 }
 

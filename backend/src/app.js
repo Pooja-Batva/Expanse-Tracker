@@ -23,7 +23,7 @@ app.use(helmet());
 // ─── CORS ────────────────────────────────────────────────────────────────────
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: true, // allow all origins (adjust in production)
     credentials: true, // allow cookies
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })

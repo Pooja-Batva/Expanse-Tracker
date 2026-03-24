@@ -39,16 +39,6 @@ const budgetSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-    alertThreshold: {
-      type: Number,
-      default: 80, // send alert when spent reaches X% of budget
-      min: 10,
-      max: 100,
-    },
-    alertSent: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true }
 );

@@ -33,10 +33,6 @@ export const protect = asyncHandler(async (req, _res, next) => {
     throw new ApiError(401, "User belonging to this token no longer exists.");
   }
 
-  if (!user.isVerified) {
-    throw new ApiError(403, "Please verify your email to access this resource.");
-  }
-
   req.user = user;
   next();
 });

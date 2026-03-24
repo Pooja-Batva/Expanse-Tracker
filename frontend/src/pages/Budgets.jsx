@@ -7,19 +7,19 @@ import { Modal, ConfirmModal, Spinner, EmptyState, Amount } from '../components/
 
 const EMPTY = {
   category: '', amount: '', startDate: fmt.inputDate(new Date()),
-  endDate: '', label: '', alertThreshold: 80
+  endDate: '', label: ''
 }
 
 export default function Budgets() {
-  const [budgets, setBudgets]       = useState([])
-  const [cats, setCats]             = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [showModal, setShowModal]   = useState(false)
-  const [deleting, setDeleting]     = useState(null)
-  const [saving, setSaving]         = useState(false)
-  const [form, setForm]             = useState(EMPTY)
+  const [budgets, setBudgets] = useState([])
+  const [cats, setCats] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [deleting, setDeleting] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState(EMPTY)
   const [showActive, setShowActive] = useState(true)
-  const [expanded, setExpanded]     = useState({})
+  const [expanded, setExpanded] = useState({})
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -30,21 +30,21 @@ export default function Budgets() {
       ])
       setBudgets(budgetRes.data.data)
       setCats(catRes.data.data)
-    } catch (_) {}
+    } catch (_) { }
     finally { setLoading(false) }
   }, [])
 
   useEffect(() => { load() }, [load])
 
   const now = new Date()
-  const activeBudgets   = budgets.filter(b => new Date(b.startDate) <= now && new Date(b.endDate) >= now)
+  const activeBudgets = budgets.filter(b => new Date(b.startDate) <= now && new Date(b.endDate) >= now)
   const inactiveBudgets = budgets.filter(b => new Date(b.endDate) < now || new Date(b.startDate) > now)
 
   const handleSave = async (e) => {
     e.preventDefault()
     setSaving(true)
     try {
-      await budgetAPI.create({ ...form, amount: Number(form.amount), alertThreshold: Number(form.alertThreshold) })
+      await budgetAPI.create({ ...form, amount: Number(form.amount) })
       toast.success('Budget created!')
       setShowModal(false)
       setForm(EMPTY)
@@ -68,7 +68,6 @@ export default function Budgets() {
     const pct = Math.min(100, Math.round((budget.spent / budget.amount) * 100))
     const cls = progressClass(pct)
     const isOver = pct >= 100
-    const isWarning = pct >= budget.alertThreshold && pct < 100
 
     return (
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -77,8 +76,8 @@ export default function Budgets() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
               width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-              background: isOver ? 'var(--expense-dim)' : isWarning ? 'var(--warning-dim)' : 'var(--accent-dim)',
-              color: isOver ? 'var(--expense)' : isWarning ? 'var(--warning)' : 'var(--accent)',
+              background: isOver ? 'var(--expense-dim)' : 'var(--accent-dim)',
+              color: isOver ? 'var(--expense)' : 'var(--accent)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22
             }}>
               {budget.category?.icon}
@@ -92,11 +91,11 @@ export default function Budgets() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
-            {(isWarning || isOver) && (
+            {isOver && (
               <div style={{
                 padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700,
-                background: isOver ? 'var(--expense-dim)' : 'var(--warning-dim)',
-                color: isOver ? 'var(--expense)' : 'var(--warning)',
+                background: 'var(--expense-dim)',
+                color: 'var(--expense)',
                 display: 'flex', alignItems: 'center', gap: 4
               }}>
                 <AlertTriangle size={12} />
@@ -138,9 +137,8 @@ export default function Budgets() {
           </div>
         </div>
 
-        {/* Alert threshold line */}
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-          <span>Alert at {budget.alertThreshold}%</span>
+        {/* Transactions toggle */}
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', justifyContent: 'flex-end' }}>
           <button
             style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 11, display: 'flex', alignItems: 'center', gap: 3 }}
             onClick={() => toggleExpand(budget._id)}
@@ -231,14 +229,6 @@ export default function Budgets() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Alert Threshold — {form.alertThreshold}%</label>
-            <input type="range" min="10" max="100" step="5" value={form.alertThreshold}
-              onChange={setF('alertThreshold')}
-              style={{ width: '100%', accentColor: 'var(--accent)' }} />
-            <div className="form-hint">Get an email alert when you reach {form.alertThreshold}% of this budget</div>
-          </div>
-
           <div className="modal-actions">
             <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
@@ -258,13 +248,13 @@ export default function Budgets() {
 }
 
 function BudgetTransactions({ budgetId }) {
-  const [txs, setTxs]       = useState([])
+  const [txs, setTxs] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     budgetAPI.getTransactions(budgetId)
       .then(({ data }) => setTxs(data.data))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false))
   }, [budgetId])
 
